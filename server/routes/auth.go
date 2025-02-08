@@ -11,6 +11,7 @@ func Routes() (*mux.Router){
 	
 	r.HandleFunc("/signup",controller.Signup).Methods("POST");
 	r.HandleFunc("/login",controller.Login).Methods("POST");
+	r.HandleFunc("/verify",controller.Verifytoken).Methods("POST");
 
 	return r;
 }
