@@ -19,7 +19,7 @@ const SignupPage = () => {
       .update(password)
       .digest("hex");
     console.log(hashPassword);
-    let res = await fetch("http://localhost:8000/insert", {
+    let res = await fetch("http://localhost:8000/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,7 +30,9 @@ const SignupPage = () => {
         password: hashPassword,
       }),
     });
-    console.log(await res.json());
+    let data = await res.json();
+    console.log(data);
+    localStorage.setItem("token", data.token);
   };
 
   return (

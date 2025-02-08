@@ -1,15 +1,26 @@
 "use client";
 import React, { useState } from "react";
+import crypto from "crypto";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle login logic here
-    console.log("Email:", email);
-    console.log("Password:", password);
+    let token = localStorage.getItem("token");
+    let hashPassword = crypto
+      .createHash("sha256")
+      .update(password)
+      .digest("hex");
+    let res = await fetch("http://localhost:8000/login", {
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+      body: JSON.stringify({ email, password: hashPassword, token }),
+    });
+
+    console.log(await res.json());
   };
 
   return (

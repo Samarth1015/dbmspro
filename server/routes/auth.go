@@ -8,8 +8,9 @@ import (
 
 func Routes() (*mux.Router){
 	r := mux.NewRouter();
-	r.HandleFunc("/",controller.AllValue).Methods("GET");
-	r.HandleFunc("/insert",controller.InsertData).Methods("POST");
+	
+	r.HandleFunc("/signup",controller.Signup).Methods("POST");
+	r.HandleFunc("/login",controller.Login).Methods("POST");
 
 	return r;
 }

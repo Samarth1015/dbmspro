@@ -1,40 +1,73 @@
 package controller
 
 import (
+	
 	"backend/model"
 	"encoding/json"
 	"fmt"
+
 	"log"
 
 	"net/http"
 )
 
 
-func AllValue(w http.ResponseWriter,r *http.Request) {
-	
-   db:=ConnectionToDb();
-   rows,err:=db.Query(
-	"SELECT * from teacher",
-   );
-   if err!=nil {
-	panic("some error in selecting the values");
+func Login(w http.ResponseWriter,r *http.Request){
 
-   }
-   type Teacher struct{
-      Name string
-   }
-   var value  Teacher;
-   for rows.Next(){
-      rows.Scan(&value.Name);
-     
-   }
-    fmt.Print(value);
+    fmt.Println("in login");
+    db:=ConnectionToDb();
+    defer db.Close();
+    
+
+    type userStruct struct{
+        Email    string `json:"email"`
+        Password string `json:"password"`
+        Token   string `json:"token"`
+    }
+    var user userStruct;
+    json.NewDecoder(r.Body).Decode(&user); 
+    fmt.Print(user);
+   err:=
+    VerifyToken(user.Token);
+    if err!=nil {
+        w.WriteHeader(http.StatusUnauthorized);
+        json.NewEncoder(w).Encode(map[string]string{"message": "Invalid token"});
+        return;     
+    }
+    res,err:=db.Query("select email,password_hash from users where email=?",user.Email);
+
+    if err!=nil{
+        log.Fatal("error in selecting");
+    }
+    var dbEmail, dbPasswordHash string
+    for res.Next() {
+        err := res.Scan(&dbEmail, &dbPasswordHash)
+        if err != nil {
+            log.Fatal("error scanning result")
+        }
+    }
+
+    
+    
+
+   
+    if user.Password == dbPasswordHash {
+        w.WriteHeader(http.StatusOK)
+        json.NewEncoder(w).Encode(map[string]string{"message": "Login successful"})
+    } else {
+        w.WriteHeader(http.StatusUnauthorized)
+        json.NewEncoder(w).Encode(map[string]string{"message": "Invalid credentials"})
+    }
 
 
 
-	
+
 }
-func InsertData(w http.ResponseWriter, r *http.Request) {
+
+func Signup(w http.ResponseWriter, r *http.Request) {
+        db := ConnectionToDb()
+    defer db.Close()
+    fmt.Println("signup");
     query := "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)"
 
     var res model.User
@@ -49,8 +82,7 @@ func InsertData(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    db := ConnectionToDb()
-    defer db.Close()
+
 
  
     var existingUser int
@@ -59,6 +91,7 @@ func InsertData(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Email already exists", http.StatusConflict)
         return
     }
+  token,err:=  CreateToken(res.Username,res.Email);
 
     result, err := db.Exec(query, res.Username, res.Email, res.PasswordHash)
     if err != nil {
@@ -73,6 +106,7 @@ func InsertData(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Error retrieving user ID", http.StatusInternalServerError)
         return
     }
+    
 
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
@@ -80,5 +114,6 @@ func InsertData(w http.ResponseWriter, r *http.Request) {
         "status":  http.StatusOK,
         "message": "User inserted successfully",
         "id":      id,
+        "token":token,
     })
 }
