@@ -10,7 +10,7 @@ export default function Staff() {
 
       console.log(token);
       try {
-        let res = await fetch("http://localhost:8000/staff", {
+        let res = await fetch("http://localhost:8000/customer", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -23,8 +23,8 @@ export default function Staff() {
         }
         console.log(await res.json());
       } catch (error) {
-        console.error("Token verification failed:", error);
         redirect("/login");
+        console.error("Token verification failed:", error);
       }
     };
     collect();

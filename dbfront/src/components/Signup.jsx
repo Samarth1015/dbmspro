@@ -1,38 +1,52 @@
 "use client";
 import React, { useState } from "react";
 import crypto from "crypto";
+import { useRouter } from "next/navigation"; // ✅ Import useRouter
+
 const SignupPage = () => {
+  const router = useRouter(); // ✅ Initialize router
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle signup logic here
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
+
     let hashPassword = crypto
       .createHash("sha256")
       .update(password)
       .digest("hex");
     console.log(hashPassword);
-    let res = await fetch("http://localhost:8000/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: name,
-        email: email,
-        password: hashPassword,
-      }),
-    });
-    let data = await res.json();
-    console.log(data);
-    localStorage.setItem("token", data.token);
+
+    try {
+      let res = await fetch("http://localhost:8000/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          password: hashPassword,
+          role: role,
+        }),
+      });
+
+      let data = await res.json();
+      console.log(data);
+      localStorage.setItem("token", data.token);
+      console.log(role);
+
+      router.push(`/${role}`);
+    } catch (err) {
+      alert("already user ");
+      router.push("/login");
+      console.error("Signup failed:", err);
+    }
   };
 
   return (
@@ -89,6 +103,33 @@ const SignupPage = () => {
               required
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Role:
+            </label>
+            <div className="mt-1">
+              <label className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  value="customer"
+                  checked={role === "customer"}
+                  onChange={(e) => setRole(e.target.checked ? "customer" : "")}
+                  className="form-checkbox"
+                />
+                <span className="ml-2">Customer</span>
+              </label>
+              <label className="inline-flex items-center ml-6">
+                <input
+                  type="checkbox"
+                  value="staff"
+                  checked={role === "staff"}
+                  onChange={(e) => setRole(e.target.checked ? "staff" : "")}
+                  className="form-checkbox"
+                />
+                <span className="ml-2">Staff</span>
+              </label>
+            </div>
           </div>
           <button
             type="submit"

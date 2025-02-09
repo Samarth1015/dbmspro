@@ -1,11 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import crypto from "crypto";
-import { redirect } from "next/navigation";
+
+import { useRouter } from "next/navigation";
 
 const Login = () => {
+  const useroute = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,15 +18,26 @@ const Login = () => {
       .createHash("sha256")
       .update(password)
       .digest("hex");
-    let res = await fetch("http://localhost:8000/login", {
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify({ email, password: hashPassword }),
-    });
+    try {
+      let res = await fetch(`http://localhost:8000/login`, {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ email, password: hashPassword, role }),
+      });
+      console.log("stat", res.status);
+      if (res.status === 401) {
+        alert("Invalid credentials");
+      } else {
+        let data = await res.json();
 
-    let data = await res.json();
-    localStorage.setItem("token", data.token);
-    redirect("/staff");
+        console.log(data);
+        localStorage.setItem("token", data?.token);
+        console.log(role);
+        useroute.push(`/${role}`);
+      }
+    } catch (err) {
+      console.error("Login failed:", err);
+    }
   };
 
   return (
@@ -56,6 +70,35 @@ const Login = () => {
               required
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Role:
+            </label>
+            <div className="mt-1 flex items-center">
+              <input
+                type="radio"
+                id="customer"
+                name="role"
+                value="customer"
+                onChange={(e) => setRole(e.target.value)}
+                required
+                className="mr-2"
+              />
+              <label htmlFor="customer" className="mr-4">
+                Customer
+              </label>
+              <input
+                type="radio"
+                id="staff"
+                name="role"
+                value="staff"
+                onChange={(e) => setRole(e.target.value)}
+                required
+                className="mr-2"
+              />
+              <label htmlFor="staff">Staff</label>
+            </div>
           </div>
           <button
             type="submit"
