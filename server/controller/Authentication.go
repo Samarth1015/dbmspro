@@ -2,6 +2,8 @@ package controller
 
 import (
 	"backend/model"
+	"backend/util"
+	
 	"encoding/json"
 	"fmt"
 	"log"
@@ -38,7 +40,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
             log.Fatal("error scanning result", err)
         }
     }
-    token, err := CreateToken(name, email)
+    token, err := CreateToken(name, email,role)
     if err != nil {
         log.Fatal("error in creating token")
     }
@@ -87,9 +89,11 @@ func Signup(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Email already exists", http.StatusConflict)
         return
     }
-    token, err := CreateToken(res.Name, res.Email)
+    token, err := CreateToken(res.Name, res.Email,res.Role)
 
-    result, err := db.Exec(query, "c102", res.Name, res.Password, res.Email)
+    idi:=util.Random();
+fmt.Println("coustomerid",idi);
+    result, err := db.Exec(query, idi , res.Name, res.Password, res.Email)
     if err != nil {
         log.Println("Error inserting user:", err)
         http.Error(w, "Error inserting data", http.StatusInternalServerError)

@@ -19,7 +19,7 @@ const Login = () => {
       .update(password)
       .digest("hex");
     try {
-      let res = await fetch(`http://localhost:8000/login`, {
+      let res = await fetch(`http://localhost:8000/api/login`, {
         headers: { "Content-Type": "application/json" },
         method: "POST",
         body: JSON.stringify({ email, password: hashPassword, role }),

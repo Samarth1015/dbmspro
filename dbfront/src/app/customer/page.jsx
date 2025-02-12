@@ -8,9 +8,8 @@ export default function Staff() {
     let collect = async () => {
       let token = localStorage.getItem("token");
 
-      console.log(token);
       try {
-        let res = await fetch("http://localhost:8000/customer", {
+        let res = await fetch("http://localhost:8000/api/customer", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -24,10 +23,13 @@ export default function Staff() {
         console.log(await res.json());
       } catch (error) {
         redirect("/login");
-        console.error("Token verification failed:", error);
       }
     };
     collect();
   }, []);
-  return <>hiiii</>;
+  return (
+    <>
+      <div></div>
+    </>
+  );
 }

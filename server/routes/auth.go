@@ -9,10 +9,12 @@ import (
 func Routes() (*mux.Router){
 	r := mux.NewRouter();
 	
-	r.HandleFunc("/signup",controller.Signup).Methods("POST");
-	r.HandleFunc("/login",controller.Login).Methods("POST");
-	r.HandleFunc("/staff", controller.VerifyJWT(controller.Staff)).Methods("POST");
-	r.HandleFunc("/customer",controller.VerifyJWT(controller.Customer)).Methods("POST");
+	r.HandleFunc("/api/signup",controller.Signup).Methods("POST");
+	r.HandleFunc("/api/login",controller.Login).Methods("POST");
+	r.HandleFunc("/api/staff", controller.VerifyJWT(controller.Staff)).Methods("POST");
+	r.HandleFunc("/api/customer",controller.VerifyJWT(controller.Customer)).Methods("POST");
+	// r.HandleFunc("/api/add",controller.VerifyJWT(controller.AddData)).Methods("POST");
+	
 
 	return r;
 }

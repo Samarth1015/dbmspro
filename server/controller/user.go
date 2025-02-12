@@ -1,12 +1,10 @@
 package controller
 
 import (
+	"backend/util"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	
-
-	
 )
 
 // Staff - Handler to access user claims from request headers
@@ -52,4 +50,41 @@ func Customer(w http.ResponseWriter, r *http.Request) {
 		"email":    email,
 		"exp":      exp,
 	})
+}
+
+
+func AddData(w http.ResponseWriter, r *http.Request) {
+	
+type Order struct {
+	CustomerID string `json:"customer_id"`
+	OrderDate  string `json:"order_date"`
+	Status     string `json:"status"`
+	Price      string `json:"price"`
+	Quantity   string `json:"quantity"`
+}
+	var order Order
+	err := json.NewDecoder(r.Body).Decode(&order)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	db:=ConnectionToDb();
+	order_id:=util.Random();
+	name:=r.Header.Get(	"X-Claim-username")	
+	var staff_id string;
+	db.QueryRow("select staff_id from staff where name=?",name).Scan(&staff_id)
+	fmt.Println("staff_id--->",staff_id);
+	q:=`INSERT INTO orders (order_id,customer_id,staff_id, order_date, status, price, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)`
+	res,err:= db.Exec(q,order_id,order.CustomerID,staff_id,order.OrderDate,order.Status,order.Price,order.Quantity)
+	if err!=nil{ 
+		fmt.Println("Error inserting order:", err)
+		}
+		fmt.Println("Order inserted successfully",res)
+		
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		
+	json.NewEncoder(w).Encode(order);
 }

@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import jwt from "jsonwebtoken";
 import { redirect } from "next/navigation";
+import Staffi from "@/components/Staffi";
 
 export default function Staff() {
   useEffect(() => {
@@ -10,7 +11,7 @@ export default function Staff() {
 
       console.log(token);
       try {
-        let res = await fetch("http://localhost:8000/staff", {
+        let res = await fetch("http://localhost:8000/api/staff", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -29,5 +30,9 @@ export default function Staff() {
     };
     collect();
   }, []);
-  return <>hiiii</>;
+  return (
+    <>
+      <Staffi></Staffi>
+    </>
+  );
 }
