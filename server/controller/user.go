@@ -106,7 +106,7 @@ func AddData(w http.ResponseWriter, r *http.Request) {
 		}
 
 		
-		query = `INSERT INTO order_services (order_id, service_id, quantity) VALUES (?, ?, ?)`
+		
 		_, err = db.Exec(query, orderID, serviceID, service.Quantity)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
