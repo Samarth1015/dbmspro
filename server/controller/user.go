@@ -2,6 +2,7 @@ package controller
 
 import (
 	// "backend/util"
+	"backend/util"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -51,45 +52,78 @@ func Customer(w http.ResponseWriter, r *http.Request) {
 		"exp":      exp,
 	})
 }
-
-
 func AddData(w http.ResponseWriter, r *http.Request) {
+	db:=ConnectionToDb()
+	defer db.Close()
 	type Service struct {
-			ServiceName string `json:"service_name"`
-			Quantity   string `json:"quantity"`
+		ServiceName string `json:"service_name"`
+		Quantity    int    `json:"quantity"`
 	}
-type Order struct {
-	Name string `json:"name"`
-	OrderDate  string `json:"order_date"`
-	Status     string `json:"status"`
-	Price      string `json:"price"`
-	Quantity   string `json:"quantity"`
-	Service []Service `json:"service"`
-}
+
+	type Order struct {
+		CustomerID string    `json:"customer_id"`
+		Name       string    `json:"name"`
+		OrderDate  string    `json:"order_date"`
+		Status     string    `json:"status"`
+		Price      int       `json:"price"`
+		Services   []Service `json:"services"`
+	}
+
 	var order Order
 	err := json.NewDecoder(r.Body).Decode(&order)
-	fmt.Println("Order--->",order);
-
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
 		return
 	}
 
-	// db:=ConnectionToDb();
-	// order_id:=util.Random();
-	// name:=r.Header.Get(	"X-Claim-username")	
-	// var staff_id string;
-	// db.QueryRow("select staff_id from staff where name=?",name).Scan(&staff_id)
-	// fmt.Println("staff_id--->",staff_id);
-	// q:=`INSERT INTO orders (order_id,customer_id,staff_id, order_date, status, price, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)`
-	// res,err:= db.Exec(q,order_id,order.,staff_id,order.OrderDate,order.Status,order.Price,order.Quantity)
-	// if err!=nil{ 
-	// 	fmt.Println("Error inserting order:", err)
-	// 	}
-	// 	fmt.Println("Order inserted successfully",res)
-		
-	// 	w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		
-	json.NewEncoder(w).Encode("ok");
+	// Validate required fields
+	if order.CustomerID == "" || order.Name == "" || order.OrderDate == "" || order.Status == "" || order.Price == 0 || len(order.Services) == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "All fields are required"})
+		return
+	}
+
+	// Insert into orders table
+	orderID := generateOrderID() // Implement this function to generate a unique order ID
+	query := `INSERT INTO orders (order_id, customer_id, staff_id, order_date, status, price) VALUES (?, ?, ?, ?, ?, ?)`
+	_, err = db.Exec(query, orderID, order.CustomerID, "staff_id_placeholder", order.OrderDate, order.Status, order.Price)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to insert order"})
+		return
+	}
+
+	// Insert into services table
+	for _, service := range order.Services {
+		serviceID := generateServiceID() // Implement this function to generate a unique service ID
+		query := `INSERT INTO services (service_id, name, price_per_item) VALUES (?, ?, ?)`
+		_, err = db.Exec(query, serviceID, service.ServiceName, 0) // Replace 0 with actual price if available
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Failed to insert service"})
+			return
+		}
+
+		// Insert into order_services table (assuming such a table exists)
+		query = `INSERT INTO order_services (order_id, service_id, quantity) VALUES (?, ?, ?)`
+		_, err = db.Exec(query, orderID, serviceID, service.Quantity)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Failed to insert order service"})
+			return
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Order created successfully"})
+}
+
+func generateOrderID() int {
+return util.Random();
+}
+
+func generateServiceID() int {
+	// Implement logic to generate a unique service ID
+	return util.Random();
 }
