@@ -77,15 +77,15 @@ func AddData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate required fields
+	
 	if order.CustomerID == "" || order.Name == "" || order.OrderDate == "" || order.Status == "" || order.Price == 0 || len(order.Services) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": "All fields are required"})
 		return
 	}
 
-	// Insert into orders table
-	orderID := generateOrderID() // Implement this function to generate a unique order ID
+	
+	orderID := generateOrderID() 
 	query := `INSERT INTO orders (order_id, customer_id, staff_id, order_date, status, price) VALUES (?, ?, ?, ?, ?, ?)`
 	_, err = db.Exec(query, orderID, order.CustomerID, "staff_id_placeholder", order.OrderDate, order.Status, order.Price)
 	if err != nil {
@@ -94,18 +94,18 @@ func AddData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Insert into services table
+	
 	for _, service := range order.Services {
-		serviceID := generateServiceID() // Implement this function to generate a unique service ID
+		serviceID := generateServiceID() 
 		query := `INSERT INTO services (service_id, name, price_per_item) VALUES (?, ?, ?)`
-		_, err = db.Exec(query, serviceID, service.ServiceName, 0) // Replace 0 with actual price if available
+		_, err = db.Exec(query, serviceID, service.ServiceName, 0) 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]string{"error": "Failed to insert service"})
 			return
 		}
 
-		// Insert into order_services table (assuming such a table exists)
+		
 		query = `INSERT INTO order_services (order_id, service_id, quantity) VALUES (?, ?, ?)`
 		_, err = db.Exec(query, orderID, serviceID, service.Quantity)
 		if err != nil {
@@ -124,6 +124,6 @@ return util.Random();
 }
 
 func generateServiceID() int {
-	// Implement logic to generate a unique service ID
+	
 	return util.Random();
 }
