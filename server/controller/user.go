@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"backend/util"
+	// "backend/util"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -54,37 +54,42 @@ func Customer(w http.ResponseWriter, r *http.Request) {
 
 
 func AddData(w http.ResponseWriter, r *http.Request) {
-	
+	type Service struct {
+			ServiceName string `json:"service_name"`
+			Quantity   string `json:"quantity"`
+	}
 type Order struct {
-	CustomerID string `json:"customer_id"`
+	Name string `json:"name"`
 	OrderDate  string `json:"order_date"`
 	Status     string `json:"status"`
 	Price      string `json:"price"`
 	Quantity   string `json:"quantity"`
+	Service []Service `json:"service"`
 }
 	var order Order
 	err := json.NewDecoder(r.Body).Decode(&order)
+	fmt.Println("Order--->",order);
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	db:=ConnectionToDb();
-	order_id:=util.Random();
-	name:=r.Header.Get(	"X-Claim-username")	
-	var staff_id string;
-	db.QueryRow("select staff_id from staff where name=?",name).Scan(&staff_id)
-	fmt.Println("staff_id--->",staff_id);
-	q:=`INSERT INTO orders (order_id,customer_id,staff_id, order_date, status, price, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)`
-	res,err:= db.Exec(q,order_id,order.CustomerID,staff_id,order.OrderDate,order.Status,order.Price,order.Quantity)
-	if err!=nil{ 
-		fmt.Println("Error inserting order:", err)
-		}
-		fmt.Println("Order inserted successfully",res)
+	// db:=ConnectionToDb();
+	// order_id:=util.Random();
+	// name:=r.Header.Get(	"X-Claim-username")	
+	// var staff_id string;
+	// db.QueryRow("select staff_id from staff where name=?",name).Scan(&staff_id)
+	// fmt.Println("staff_id--->",staff_id);
+	// q:=`INSERT INTO orders (order_id,customer_id,staff_id, order_date, status, price, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)`
+	// res,err:= db.Exec(q,order_id,order.,staff_id,order.OrderDate,order.Status,order.Price,order.Quantity)
+	// if err!=nil{ 
+	// 	fmt.Println("Error inserting order:", err)
+	// 	}
+	// 	fmt.Println("Order inserted successfully",res)
 		
-		w.Header().Set("Content-Type", "application/json")
+	// 	w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		
-	json.NewEncoder(w).Encode(order);
+	json.NewEncoder(w).Encode("ok");
 }

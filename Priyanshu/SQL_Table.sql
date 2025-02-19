@@ -4,21 +4,21 @@ USE LaundryManagement;
 -- CUSTOMERS Table
 CREATE TABLE CUSTOMERS (
     customer_id VARCHAR(50) PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) UNIQUE NOT NULL,
     phone VARCHAR(10) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     address TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    
 );
 
 -- STAFF Table
 CREATE TABLE STAFF (
     staff_id VARCHAR(50) PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) UNIQUE NOT NULL,
     phone VARCHAR(10) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     address TEXT,
-    hire_date DATETIME DEFAULT CURRENT_TIMESTAMP
+    
 );
 
 -- SERVICES Table
@@ -35,7 +35,7 @@ CREATE TABLE ORDERS (
     staff_id VARCHAR(50),
     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     status ENUM('pending', 'in_progress', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
-    total_cost FLOAT NOT NULL,
+   
     FOREIGN KEY (customer_id) REFERENCES CUSTOMERS(customer_id) ON DELETE CASCADE,
     FOREIGN KEY (staff_id) REFERENCES STAFF(staff_id) ON DELETE SET NULL
 );
