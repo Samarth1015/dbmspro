@@ -61,3 +61,38 @@ CREATE TABLE PAYMENTS (
     payment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES ORDERS(order_id) ON DELETE CASCADE
 );
+
+
+DELIMITER $$
+
+CREATE TRIGGER update_total_cost
+AFTER INSERT ON ORDER_DETAILS
+FOR EACH ROW
+BEGIN
+    UPDATE ORDERS
+    SET total_cost = (
+        SELECT COALESCE(SUM(subtotal), 0) 
+        FROM ORDER_DETAILS 
+        WHERE order_id = NEW.order_id
+    )
+    WHERE order_id = NEW.order_id;
+END $$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE TRIGGER create_payment_entry
+AFTER INSERT ON ORDERS
+FOR EACH ROW
+BEGIN
+    INSERT INTO PAYMENTS (payment_id, order_id, amount, payment_mode, status)
+    VALUES (
+        UUID(), NEW.order_id, NEW.total_cost, 'cash', 'pending'
+    );
+END $$
+
+DELIMITER ;
+
+
