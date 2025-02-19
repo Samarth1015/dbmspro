@@ -33,7 +33,7 @@ export default function Add() {
   let addService = () => {
     setData({
       ...data,
-      services: [...data.services, (service_name: ""), (quantity: "")],
+      // services: [...data.services, (service_name: ""), (quantity: "")],
     });
   };
 

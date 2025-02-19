@@ -18,7 +18,11 @@ CREATE TABLE STAFF (
     phone VARCHAR(10) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     address TEXT,
+<<<<<<< HEAD
     
+=======
+   
+>>>>>>> c3c31559ab858d25bdc37b3e2d90f576604445e0
 );
 
 -- SERVICES Table
@@ -28,7 +32,7 @@ CREATE TABLE SERVICES (
     price_per_item FLOAT NOT NULL
 );
 
--- ORDERS Table
+
 CREATE TABLE ORDERS (
     order_id VARCHAR(50) PRIMARY KEY,
     customer_id VARCHAR(50) NOT NULL,
@@ -40,7 +44,6 @@ CREATE TABLE ORDERS (
     FOREIGN KEY (staff_id) REFERENCES STAFF(staff_id) ON DELETE SET NULL
 );
 
--- ORDER_DETAILS Table (Many-to-Many relationship between Orders and Services)
 CREATE TABLE ORDER_DETAILS (
     order_detail_id VARCHAR(50) PRIMARY KEY,
     order_id VARCHAR(50) NOT NULL,
