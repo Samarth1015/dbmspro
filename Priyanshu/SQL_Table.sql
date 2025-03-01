@@ -1,4 +1,4 @@
-CREATE IF NOT EXISTS DATABASE LaundryManagement;
+CREATE database IF NOT EXISTS  LaundryManagement;
 USE LaundryManagement;
 
 -- CUSTOMERS Table
@@ -7,9 +7,8 @@ CREATE TABLE CUSTOMERS (
     name VARCHAR(100) NOT NULL,
     phone VARCHAR(10) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    address TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+    address VARCHAR(150)
+    );
 
 -- STAFF Table
 CREATE TABLE STAFF (
@@ -17,8 +16,7 @@ CREATE TABLE STAFF (
     name VARCHAR(100) NOT NULL,
     phone VARCHAR(10) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    address TEXT,
-    hire_date DATETIME DEFAULT CURRENT_TIMESTAMP
+    address VARCHAR(150)
 );
 
 -- SERVICES Table
@@ -35,7 +33,7 @@ CREATE TABLE ORDERS (
     staff_id VARCHAR(50),
     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     status ENUM('pending', 'in_progress', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
-    total_cost FLOAT NOT NULL,
+    
     FOREIGN KEY (customer_id) REFERENCES CUSTOMERS(customer_id) ON DELETE CASCADE,
     FOREIGN KEY (staff_id) REFERENCES STAFF(staff_id) ON DELETE SET NULL
 );
