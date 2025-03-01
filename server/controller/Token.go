@@ -58,6 +58,7 @@ func VerifyToken(tokenString string) (jwt.MapClaims, error) {
 
 
 func  VerifyJWT(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
+	fmt.Println("inside verify jwt")
 	return func(w http.ResponseWriter, r *http.Request) {
 		
 		authHeader := r.Header.Get("Authorization")
