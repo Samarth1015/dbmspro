@@ -5,10 +5,9 @@ USE LaundryManagement;
 CREATE TABLE CUSTOMERS (
     customer_id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    phone VARCHAR(10) UNIQUE NOT NULL,
+    phone VARCHAR(10) UNIQUE NOT NULL, //only one values needed
     email VARCHAR(100) UNIQUE NOT NULL,
-    address TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    address VARCHAR(250),
 );
 
 -- STAFF Table
