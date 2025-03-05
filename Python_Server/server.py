@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
+from postgres_server import add_new_laundry
 app = Flask(__name__)
 
 
@@ -34,6 +34,20 @@ with app.app_context():
 #     "name": "John Doe",
 #     "address": "123 Main St"
 # }
+
+
+@app.route('/api/addLaundry' , methods=["POST"])
+def add_laundry():
+    data = request.get_json()
+    
+    service_id = int(data['service_id'])
+    quantity =int(data['quantity'])
+    customer_id = int(data['customer_id'])
+    staff_id = int(data['staff_id'])
+    order_date = datetime.today().date()
+    add_new_laundry(customer_id=customer_id , service_id=service_id , quantity=quantity , staff_id=staff_id , order_date=order_date)
+    return "Done sending to order placed!!!!!"
+
 @app.route('/api/customer/signup', methods=['POST'])
 def customer_signup():
     try:
