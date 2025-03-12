@@ -14,7 +14,7 @@ func Routes() (*mux.Router){
 	r.HandleFunc("/api/staff", controller.VerifyJWT(controller.Staff)).Methods("POST");
 	r.HandleFunc("/api/customer",controller.VerifyJWT(controller.Customer)).Methods("POST");
 	r.HandleFunc("/api/add",controller.AddData).Methods("POST");
-	r.HandleFunc("/api/getdata",controller.Getitem).Methods("POST");
+
 	
 
 	return r;
