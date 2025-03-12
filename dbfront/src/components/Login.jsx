@@ -31,9 +31,15 @@ const Login = () => {
         let data = await res.json();
 
         console.log(data);
-        localStorage.setItem("token", data?.token);
+        localStorage.setItem("id", data.id);
+
+        if (role === "staff") {
+          useroute.push(`/staff`);
+        } else {
+          useroute.push(`/customer`);
+        }
+
         console.log(role);
-        useroute.push(`/${role}`);
       }
     } catch (err) {
       console.error("Login failed:", err);

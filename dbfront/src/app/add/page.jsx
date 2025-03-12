@@ -1,154 +1,115 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 
 export default function Add() {
-  const [data, setData] = useState({
-    customer_id: "",
-    name: "",
-    order_date: "",
-    status: "",
-    price: "",
-    services: [], // Array to store multiple services
-  });
+  const [email, setEmail] = useState("");
+  const [selectedServices, setSelectedServices] = useState([]);
 
-  const handleData = async () => {
-    if (
-      !data.customer_id ||
-      !data.name ||
-      !data.order_date ||
-      !data.status ||
-      !data.price ||
-      data.services.length === 0
-    ) {
-      alert("Fill all fields and add at least one service");
-      return;
-    }
+  const services = [
+    { id: 1, name: "wash", price: 10 },
+    { id: 2, name: "dryclean", price: 20 },
+    { id: 3, name: "press", price: 5 },
+    { id: 4, name: "wash and press", price: 12 },
+  ];
 
-    // Validate price and service quantities
-    if (isNaN(data.price)) {
-      alert("Price must be a number");
-      return;
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const orderData = {
+      email,
+      services: selectedServices.map((service) => ({
+        service_id: service.id,
+        quantity: service.quantity || 1,
+      })),
+    };
 
-    for (const service of data.services) {
-      if (isNaN(service.quantity)) {
-        alert("Service quantity must be a number");
-        return;
-      }
-    }
-
-    console.log(data);
     try {
-      const res = await fetch("http://localhost:8000/api/add", {
+      const response = await fetch("http://localhost:8000/api/addorder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(orderData),
       });
 
-      // Check if the response is OK (status code 200-299)
-      if (!res.ok) {
-        const errorText = await res.text(); // Get the raw response text
-        console.error("Backend error:", errorText);
-        alert(`Backend error: ${errorText}`);
-        return;
-      }
-
-      // Try to parse the response as JSON
-      const responseData = await res.json();
-      console.log(responseData);
+      const result = await response.json();
+      console.log(result);
+      alert("Order added successfully!");
     } catch (error) {
-      console.error("Fetch error:", error);
-      alert("An error occurred while submitting the data.");
+      console.error("Error adding order:", error);
+      alert("Failed to add order. Please try again.");
     }
   };
 
-  const addService = () => {
-    setData({
-      ...data,
-      services: [...data.services, { service_name: "", quantity: "" }],
-    });
-  };
-
-  const updateService = (index, key, value) => {
-    const updatedServices = [...data.services];
-    updatedServices[index][key] = value;
-    setData({ ...data, services: updatedServices });
+  const handleServiceChange = (serviceId, quantity) => {
+    setSelectedServices((prev) =>
+      prev.find((s) => s.id === serviceId)
+        ? prev.map((s) => (s.id === serviceId ? { ...s, quantity } : s))
+        : [...prev, { id: serviceId, quantity }]
+    );
   };
 
   return (
-    <div className="p-4">
-      <input
-        onChange={(e) => setData({ ...data, customer_id: e.target.value })}
-        type="text"
-        name="customer_id"
-        placeholder="Customer ID"
-        className="border p-2 rounded w-full mb-2"
-      />
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+          Add New Order
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Email Input */}
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
 
-      <input
-        onChange={(e) => setData({ ...data, name: e.target.value })}
-        type="text"
-        name="name"
-        placeholder="Customer Name"
-        className="border p-2 rounded w-full mb-2"
-      />
+          {/* Services List */}
+          <div>
+            <h3 className="text-lg font-semibold mb-3 text-gray-700">
+              Select Services
+            </h3>
+            {services.map((service) => (
+              <div
+                key={service.id}
+                className="flex items-center justify-between mb-4"
+              >
+                <label className="text-sm font-medium text-gray-600">
+                  {service.name} (${service.price})
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  onChange={(e) =>
+                    handleServiceChange(
+                      service.id,
+                      parseInt(e.target.value) || 1
+                    )
+                  }
+                  placeholder="Quantity"
+                  className="w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+            ))}
+          </div>
 
-      <input
-        onChange={(e) => setData({ ...data, order_date: e.target.value })}
-        type="date"
-        name="order_date"
-        className="border p-2 rounded w-full mb-2"
-      />
-
-      <input
-        onChange={(e) => setData({ ...data, status: e.target.value })}
-        type="text"
-        name="status"
-        placeholder="Status"
-        className="border p-2 rounded w-full mb-2"
-      />
-
-      <h3 className="mt-4">Services:</h3>
-      {data.services.map((service, index) => (
-        <div key={index} className="flex gap-2 mb-2">
-          <input
-            type="text"
-            placeholder="Service Name"
-            className="border p-2 rounded w-full"
-            value={service.service_name}
-            onChange={(e) =>
-              updateService(index, "service_name", e.target.value)
-            }
-          />
-          <input
-            onChange={(e) => setData({ ...data, price: e.target.value })}
-            type="number"
-            name="price"
-            placeholder="Price"
-            className="border p-2 rounded w-full mb-2"
-          />
-          <input
-            type="number"
-            placeholder="Quantity"
-            className="border p-2 rounded w-20"
-            value={service.quantity}
-            onChange={(e) => updateService(index, "quantity", e.target.value)}
-          />
-        </div>
-      ))}
-      <button
-        onClick={addService}
-        className="bg-blue-500 text-white px-3 py-1 rounded"
-      >
-        + Add Service
-      </button>
-
-      <button
-        onClick={handleData}
-        className="bg-green-500 text-white px-4 py-2 rounded mt-4"
-      >
-        Submit
-      </button>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
+          >
+            Add Order
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

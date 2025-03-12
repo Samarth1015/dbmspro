@@ -4,19 +4,16 @@ import crypto from "crypto";
 import { useRouter } from "next/navigation"; // ✅ Import useRouter
 
 const SignupPage = () => {
-  const router = useRouter(); // ✅ Initialize router
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [role, setRole] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
 
     let hashPassword = crypto
       .createHash("sha256")
@@ -31,15 +28,15 @@ const SignupPage = () => {
         body: JSON.stringify({
           name,
           email,
+          address,
           password: hashPassword,
-          role: role,
+          role: role.toLowerCase(),
         }),
       });
 
       let data = await res.json();
       console.log(data);
-      localStorage.setItem("token", data.token);
-      console.log(role);
+      localStorage.setItem("id", data.id);
 
       router.push(`/${role}`);
     } catch (err) {
@@ -92,14 +89,17 @@ const SignupPage = () => {
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Confirm Password:
+              Address
             </label>
             <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              type="text"
+              value={address}
+              onChange={(e) => {
+                setAddress(e.target.value);
+              }}
               required
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />

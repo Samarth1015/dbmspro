@@ -1,4 +1,5 @@
-package controller
+package dbconnection
+
 
 import (
 	"database/sql"
