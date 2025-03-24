@@ -17,6 +17,7 @@ type OrderRequest struct {
 		ServiceID int `json:"service_id"`
 		Quantity  int `json:"quantity"`
 	} `json:"services"`
+	Id string `json:"id"`
 }
 
 func AddOrder(w http.ResponseWriter, r *http.Request) {
@@ -50,9 +51,9 @@ func AddOrder(w http.ResponseWriter, r *http.Request) {
 	var orderID = "o"+radomnumber();
 	
 
-	// idharrr trigger lagega ekkk jo subtotal add karee
-	fmt.Print("---->sexy",customerID);
-	_,err=db.Exec("Insert into orders (order_id,customer_id,staff_id,order_date) values (?,?,?,?)", orderID, customerID,"s833",time.Now().Format("2006-01-02 15:04:05")) 
+	
+	fmt.Print("---->sexy",customerID,req.Id);
+	_,err=db.Exec("Insert into orders (order_id,customer_id,staff_id,order_date) values (?,?,?,?)", orderID, customerID,req.Id,time.Now().Format("2006-01-02 15:04:05")) 
 	if err!=nil{
 		panic(err);		
 	}

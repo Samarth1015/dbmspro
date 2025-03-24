@@ -22,6 +22,8 @@ func main() {
 	r.HandleFunc("/api/login",controller.Login);
 	r.HandleFunc("/api/addorder",controller.AddOrder);
 	r.HandleFunc("/api/getstaffdata",controller.Getitem);
+	r.HandleFunc("/api/getcutomeritem",controller.GetCustomerItem);
+	r.HandleFunc("/api/staff/{id}", controller.Updatedata).Methods("GET")
 
 
 

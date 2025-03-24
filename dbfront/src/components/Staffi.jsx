@@ -4,23 +4,21 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Staffi() {
-  const router = useRouter(); // Use useRouter for client-side navigation
-  const [orders, setOrders] = useState([]); // State to store the fetched orders
-  const [error, setError] = useState(null); // State to handle errors
-  const [staffId, setStaffId] = useState(""); // State to store the staff ID
+  const router = useRouter();
+  const [orders, setOrders] = useState([]);
+  const [error, setError] = useState(null);
+  const [staffId, setStaffId] = useState("");
 
   useEffect(() => {
-    // Check if staffid exists in localStorage, redirect to login if not
     const staffid = localStorage.getItem("id");
     if (!staffid) {
       router.push("/login");
       return;
     }
 
-    setStaffId(staffid); // Store the staff ID in state
+    setStaffId(staffid);
     console.log("Staff ID:", staffid);
 
-    // Fetch data from the backend
     const getData = async () => {
       try {
         const res = await fetch("http://localhost:8000/api/getstaffdata", {
@@ -35,7 +33,7 @@ export default function Staffi() {
 
         const data = await res.json();
         console.log("Fetched data:", data);
-        setOrders(data); // Store the fetched data in state
+        setOrders(data);
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Failed to fetch orders. Please try again.");
@@ -43,9 +41,36 @@ export default function Staffi() {
     };
 
     getData();
-  }, [router]); // Add router to dependency array
+  }, [router]);
 
-  // Function to redirect to the /add page
+  // Delete order function
+  const handleDelete = async (orderId) => {
+    if (!confirm("Are you sure you want to delete this order?")) return;
+
+    try {
+      const res = await fetch("http://localhost:8000/api/deletestafforder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: orderId }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+
+      // Remove the deleted order from state
+      setOrders(orders.filter((order) => order.order_id !== orderId));
+    } catch (err) {
+      console.error("Error deleting order:", err);
+      setError("Failed to delete order. Please try again.");
+    }
+  };
+
+  // Update order function (redirect to update page)
+  const handleUpdate = (orderId) => {
+    router.push(`/staff/update/${orderId}`);
+  };
+
   const redirectTo = () => {
     router.push("/add");
   };
@@ -65,7 +90,7 @@ export default function Staffi() {
         </div>
       )}
 
-      {orders.length === 0 && !error ? (
+      {orders?.length === 0 && !error ? (
         <p className="text-center text-gray-500">Loading orders...</p>
       ) : (
         <div className="overflow-x-auto">
@@ -76,10 +101,11 @@ export default function Staffi() {
                 <th className="py-3 px-4 text-left">Customer ID</th>
                 <th className="py-3 px-4 text-left">Order Date</th>
                 <th className="py-3 px-4 text-left">Final Total</th>
+                <th className="py-3 px-4 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order, index) => (
+              {orders?.map((order, index) => (
                 <tr
                   key={order.order_id}
                   className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
@@ -88,6 +114,20 @@ export default function Staffi() {
                   <td className="py-3 px-4 border-b">{order.customer_id}</td>
                   <td className="py-3 px-4 border-b">{order.order_date}</td>
                   <td className="py-3 px-4 border-b">{order.final_total}</td>
+                  <td className="py-3 px-4 border-b">
+                    <button
+                      onClick={() => handleUpdate(order.order_id)}
+                      className="mr-2 py-1 px-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                    >
+                      Update
+                    </button>
+                    <button
+                      onClick={() => handleDelete(order.order_id)}
+                      className="py-1 px-2 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -87,7 +87,7 @@ if role=="staff"{
 
 
 func Signup(w http.ResponseWriter,r *http.Request){
-	
+	fmt.Println("---->signup");
 	var detail Detail;
 	json.NewDecoder(r.Body).Decode(&detail)
 	result:=addindb(&detail,detail.Role)

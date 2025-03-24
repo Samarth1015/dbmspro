@@ -20,6 +20,7 @@ export default function Add() {
         service_id: service.id,
         quantity: service.quantity || 1,
       })),
+      id: localStorage.getItem("id"),
     };
 
     try {
@@ -83,7 +84,7 @@ export default function Add() {
                 className="flex items-center justify-between mb-4"
               >
                 <label className="text-sm font-medium text-gray-600">
-                  {service.name} (${service.price})
+                  {service.name} (Rs{service.price})
                 </label>
                 <input
                   type="number"
