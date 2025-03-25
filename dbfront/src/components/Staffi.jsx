@@ -48,10 +48,9 @@ export default function Staffi() {
     if (!confirm("Are you sure you want to delete this order?")) return;
 
     try {
-      const res = await fetch("http://localhost:8000/api/deletestafforder", {
-        method: "POST",
+      const res = await fetch(`http://localhost:8000/api/staff/${orderId}`, {
+        method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ order_id: orderId }),
       });
 
       if (!res.ok) {

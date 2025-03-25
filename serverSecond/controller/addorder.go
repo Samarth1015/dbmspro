@@ -7,7 +7,7 @@ import (
 	"main/dbconnection"
 	"net/http"
 	"time"
-	// Adjust import path as per your project structure
+	
 )
 
 
@@ -30,14 +30,14 @@ func AddOrder(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("--->",req.Services[0].Quantity);
 
 
-	// Get database connection from dbconnection module
+	
 	db := dbconnection.ConnectionToDb()
 	if db == nil {
 		http.Error(w, "Database connection is nil", http.StatusInternalServerError)
 		return
 	}
 
-	// Check or insert customer
+	
 	var customerID string
 	err := db.QueryRow("SELECT customer_id FROM customers WHERE email = ?", req.Email).Scan(&customerID)
 	if err == sql.ErrNoRows {
@@ -47,7 +47,7 @@ func AddOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Insert order
+	
 	var orderID = "o"+radomnumber();
 	
 
@@ -70,7 +70,7 @@ panic(err);
 
 	
 
-	// Respond with success
+	
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"order_id": orderID})

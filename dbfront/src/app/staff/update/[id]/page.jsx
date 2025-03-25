@@ -25,6 +25,7 @@ export default function Update({ params }) {
           method: "GET",
         });
         let result = await response.json();
+
         setData(result[0]);
         console.log("API Response: ", result);
       } catch (error) {
@@ -43,6 +44,7 @@ export default function Update({ params }) {
   };
 
   const handleSave = async () => {
+    console.log(data);
     try {
       let response = await fetch(`http://localhost:8000/api/staff/${id}`, {
         method: "PUT",

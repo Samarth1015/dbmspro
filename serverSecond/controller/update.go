@@ -17,14 +17,14 @@ type Innerdata struct {
 type Data struct {
     Order_id    string      `json:"order_id"`
     Customer_id string      `json:"customer_id"`
-    Inner       []Innerdata `json:"inner"` // Renamed to match JSON tag and convention
+    Inner       []Innerdata `json:"inner"` 
 }
 
 func Updatedata(w http.ResponseWriter, r *http.Request) {
-    // Get the ID from URL parameters
+   
     id := mux.Vars(r)["id"]
     
-    // Establish database connection
+  
     db := dbconnection.ConnectionToDb()
     if db == nil {
         http.Error(w, "Database connection failed", http.StatusInternalServerError)
@@ -32,7 +32,7 @@ func Updatedata(w http.ResponseWriter, r *http.Request) {
     }
     defer db.Close()
 
-    // First query to get order details
+    
     rows, err := db.Query("SELECT order_id, customer_id FROM orders WHERE order_id = ?", id)
     if err != nil {
         http.Error(w, fmt.Sprintf("Query error: %v", err), http.StatusInternalServerError)
@@ -50,7 +50,7 @@ func Updatedata(w http.ResponseWriter, r *http.Request) {
             return
         }
 
-        // Second query to get inner details
+    
         rows1, err := db.Query(`
             SELECT service_id, quantity 
             FROM orders 
@@ -61,7 +61,7 @@ func Updatedata(w http.ResponseWriter, r *http.Request) {
             return
         }
 
-        // Collect inner data
+      
         for rows1.Next() {
             var innerData Innerdata
             err := rows1.Scan(&innerData.Service_id, &innerData.Quantity)
@@ -77,17 +77,66 @@ func Updatedata(w http.ResponseWriter, r *http.Request) {
         responseData = append(responseData, tempData)
     }
 
-    // Check if rows had any errors
+   
     if err = rows.Err(); err != nil {
         http.Error(w, fmt.Sprintf("Rows error: %v", err), http.StatusInternalServerError)
         return
     }
 
-    // Set content type and send response
+   
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
     if err := json.NewEncoder(w).Encode(responseData); err != nil {
         http.Error(w, fmt.Sprintf("JSON encoding error: %v", err), http.StatusInternalServerError)
         return
     }
+}
+type ServiceItem struct {
+    ServiceID string `json:"service_id"`
+    Quantity  string `json:"quantity"`
+}
+
+type DataReq struct {
+    OrderID    string        `json:"order_id"`
+    CustomerID string        `json:"customer_id"`
+    Inner      []ServiceItem `json:"inner"`
+}
+
+func OfficialUpdate(w http.ResponseWriter, r *http.Request) {
+    
+    vars := mux.Vars(r)
+    id := vars["id"]
+    fmt.Println("Update request for ID:", id)
+
+   
+    var dataReq DataReq
+    
+   
+    err := json.NewDecoder(r.Body).Decode(&dataReq)
+    if err != nil {
+        http.Error(w, "Invalid request body", http.StatusBadRequest)
+        fmt.Println("Error decoding JSON:", err)
+        return
+    }
+
+   
+    fmt.Println("Received data:")
+    fmt.Printf("Order ID: %s\n", dataReq.OrderID)
+    fmt.Printf("Customer ID: %s\n", dataReq.CustomerID)
+    
+    fmt.Println("Services:")
+    db:=dbconnection.ConnectionToDb();
+    defer db.Close();
+    for _, item := range dataReq.Inner {
+        db.Exec("UPDATE order_details SET quantity = ? WHERE order_id = ? AND service_id = ?", item.Quantity, dataReq.OrderID, item.ServiceID);
+        
+    }
+
+  
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(map[string]string{
+        "message": "Data updated successfully",
+        "id":      id,
+    })
 }
