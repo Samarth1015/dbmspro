@@ -4,6 +4,8 @@ import React, { useState } from "react";
 export default function Add() {
   const [email, setEmail] = useState("");
   const [selectedServices, setSelectedServices] = useState([]);
+  const [paymentStatus, setPaymentStatus] = useState("pending"); // Default to 'pending'
+  const [paymentMode, setPaymentMode] = useState("cash"); // Default to 'cash'
 
   const services = [
     { id: 1, name: "wash", price: 10 },
@@ -11,6 +13,9 @@ export default function Add() {
     { id: 3, name: "press", price: 5 },
     { id: 4, name: "wash and press", price: 12 },
   ];
+
+  const paymentStatuses = ["pending", "paid"];
+  const paymentModes = ["cash", "card", "online"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,8 +25,19 @@ export default function Add() {
         service_id: service.id,
         quantity: service.quantity || 1,
       })),
+      payment_status: paymentStatus, // Add payment status
+
       id: localStorage.getItem("id"),
     };
+    if (paymentStatus === "pending") {
+      orderData.payment_status = paymentStatus;
+    }
+
+    // Conditionally add payment_mode only if paymentStatus is 'paid'
+    if (paymentStatus === "paid" && paymentMode) {
+      orderData.payment_mode = paymentMode;
+    }
+    console.log(orderData);
 
     try {
       const response = await fetch("http://localhost:8000/api/addorder", {
@@ -101,6 +117,55 @@ export default function Add() {
               </div>
             ))}
           </div>
+          <div>
+            <label
+              htmlFor="paymentStatus"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Payment Status
+            </label>
+            <select
+              id="paymentStatus"
+              value={paymentStatus}
+              onChange={(e) => setPaymentStatus(e.target.value)}
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              {paymentStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Payment Status Dropdown */}
+          {paymentStatus === "pending" ? (
+            <></>
+          ) : (
+            <>
+              {/* Payment Mode Dropdown */}
+              <div>
+                <label
+                  htmlFor="paymentMode"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Payment Mode
+                </label>
+                <select
+                  id="paymentMode"
+                  value={paymentMode}
+                  onChange={(e) => setPaymentMode(e.target.value)}
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                >
+                  {paymentModes.map((mode) => (
+                    <option key={mode} value={mode}>
+                      {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
 
           {/* Submit Button */}
           <button

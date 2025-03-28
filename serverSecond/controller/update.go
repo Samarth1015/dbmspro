@@ -1,12 +1,13 @@
 package controller
 
 import (
-    "encoding/json"
-    "fmt"
-    "main/dbconnection"
-    "net/http"
+	"encoding/json"
+	"fmt"
+	"main/dbconnection"
+	"net/http"
+	"time"
 
-    "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 )
 
 type Innerdata struct {
@@ -18,6 +19,8 @@ type Data struct {
     Order_id    string      `json:"order_id"`
     Customer_id string      `json:"customer_id"`
     Inner       []Innerdata `json:"inner"` 
+    PaymentStatus string `json:"payment_status" `
+    PaymentMethod string `json:"payment_mode"`
 }
 
 func Updatedata(w http.ResponseWriter, r *http.Request) {
@@ -82,6 +85,7 @@ func Updatedata(w http.ResponseWriter, r *http.Request) {
         http.Error(w, fmt.Sprintf("Rows error: %v", err), http.StatusInternalServerError)
         return
     }
+    db.QueryRow("select status,payment_mode from payments where order_id=?",id).Scan(&responseData[0].PaymentStatus,&responseData[0].PaymentMethod);
 
    
     w.Header().Set("Content-Type", "application/json")
@@ -99,6 +103,8 @@ type ServiceItem struct {
 type DataReq struct {
     OrderID    string        `json:"order_id"`
     CustomerID string        `json:"customer_id"`
+    PaymentStatus string `json:"payment_status" `
+    PaymentMethod string `json:"payment_mode"`
     Inner      []ServiceItem `json:"inner"`
 }
 
@@ -131,6 +137,9 @@ func OfficialUpdate(w http.ResponseWriter, r *http.Request) {
         db.Exec("UPDATE order_details SET quantity = ? WHERE order_id = ? AND service_id = ?", item.Quantity, dataReq.OrderID, item.ServiceID);
         
     }
+     date:=time.Now();
+    
+    db.Exec("UPDATE payments SET status = ?, payment_mode = ? , payment_date=? WHERE order_id = ?",dataReq.PaymentStatus,dataReq.PaymentMethod,date,dataReq.OrderID);
 
   
     w.Header().Set("Content-Type", "application/json")

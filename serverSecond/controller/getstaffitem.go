@@ -14,6 +14,7 @@ type Details struct{
 	Staff_id string `json:"staff_id"`
 	Order_date string `json:"order_date"`
 	Final_total string `json:"final_total"`
+	Status string `json:"status"`
 }
 
 func Getitem(w http.ResponseWriter, r *http.Request) {
@@ -36,11 +37,13 @@ var staffDetail Req;
 	for res.Next() {
 		var alb Details;
 		err = res.Scan(&alb.Order_id,&alb.Customer_id,&alb.Staff_id,&alb.Order_date,&alb.Final_total)
+		db.QueryRow("select status from payments where order_id=?",alb.Order_id).Scan(&alb.Status);
 		if err != nil {
 			panic(err)
 		}
 		album = append(album, alb);
 	}
+	
 	fmt.Println(album);
 	w.WriteHeader(http.StatusOK);
 	json.NewEncoder(w).Encode(album);

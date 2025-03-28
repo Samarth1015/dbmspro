@@ -18,6 +18,8 @@ type OrderRequest struct {
 		Quantity  int `json:"quantity"`
 	} `json:"services"`
 	Id string `json:"id"`
+	PaymentStatus string `json:"payment_status" `
+	PaymentMethod string `json:"payment_mode"`
 }
 
 func AddOrder(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +29,7 @@ func AddOrder(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
-	fmt.Print("--->",req.Services[0].Quantity);
+	fmt.Print("--->add order content highlish ",req);
 
 
 	
@@ -64,6 +66,22 @@ func AddOrder(w http.ResponseWriter, r *http.Request) {
 panic(err);
 	} 
 }
+var amt int;
+
+db.QueryRow("select Final_Total from orders where order_id=?",orderID).Scan(&amt);
+var paymentId = "p"+radomnumber();
+if(req.PaymentStatus=="pending"){	
+	fmt.Print("pending ke andar")
+	db.Exec("insert into payments (payment_id ,order_id,amount ,status) values (?,?,?,?)",paymentId,orderID,amt,req.PaymentStatus);
+
+}else{
+	fmt.Print("pending ke bahar")
+		_,err:=db.Exec("insert into payments (payment_id ,order_id,amount ,status,payment_mode) values (?,?,?,?,?)",paymentId,orderID,amt,req.PaymentStatus,req.PaymentMethod);
+		if err!=nil{ {
+			panic(err);
+		}}
+}
+
 // idharrr trigger lagega ekkk jo total add karee
 	
 	

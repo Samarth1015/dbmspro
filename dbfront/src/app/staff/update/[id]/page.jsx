@@ -1,17 +1,20 @@
 "use client";
-
 import { useEffect, useState } from "react";
 
 export default function Update({ params }) {
   const [id, setId] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [paymentStatus, setPaymentStatus] = useState("pending");
+  const [paymentMode, setPaymentMode] = useState("cash");
+
+  const paymentStatuses = ["pending", "paid"];
+  const paymentModes = ["cash", "card", "online"];
 
   useEffect(() => {
     let getId = async () => {
       let resolvedParams = await params;
       setId(resolvedParams.id);
-      console.log("ssss ", resolvedParams.id);
     };
     getId();
   }, [params]);
@@ -25,9 +28,10 @@ export default function Update({ params }) {
           method: "GET",
         });
         let result = await response.json();
-
         setData(result[0]);
-        console.log("API Response: ", result);
+        // Set initial payment status and mode from API response
+        setPaymentStatus(result[0].payment_status);
+        setPaymentMode(result[0].payment_mode || "cash");
       } catch (error) {
         console.error("Error fetching data: ", error);
       } finally {
@@ -44,17 +48,21 @@ export default function Update({ params }) {
   };
 
   const handleSave = async () => {
-    console.log(data);
+    const updatedData = {
+      ...data,
+      payment_status: paymentStatus,
+      ...(paymentStatus === "paid" && { payment_mode: paymentMode }), // Only include payment_mode if status is 'paid'
+    };
+
     try {
       let response = await fetch(`http://localhost:8000/api/staff/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(updatedData),
       });
       let result = await response.json();
-      console.log("Update Response: ", result);
       alert("Data updated successfully!");
     } catch (error) {
       console.error("Error updating data: ", error);
@@ -84,7 +92,7 @@ export default function Update({ params }) {
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
             Services
           </h2>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto mb-6">
             <table className="w-full bg-white shadow-md rounded-lg">
               <thead>
                 <tr className="bg-gray-200 text-gray-600 uppercase text-sm">
@@ -112,6 +120,54 @@ export default function Update({ params }) {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Payment Status Dropdown */}
+          <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+            <div className="mb-4">
+              <label
+                htmlFor="paymentStatus"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Payment Status
+              </label>
+              <select
+                id="paymentStatus"
+                value={paymentStatus}
+                onChange={(e) => setPaymentStatus(e.target.value)}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {paymentStatuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Payment Mode Dropdown - Shown only if status is 'paid' */}
+            {paymentStatus === "paid" && (
+              <div>
+                <label
+                  htmlFor="paymentMode"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Payment Mode
+                </label>
+                <select
+                  id="paymentMode"
+                  value={paymentMode}
+                  onChange={(e) => setPaymentMode(e.target.value)}
+                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {paymentModes.map((mode) => (
+                    <option key={mode} value={mode}>
+                      {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           <button

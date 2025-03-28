@@ -26,17 +26,20 @@ func GetCustomerItem(w http.ResponseWriter,r *http.Request){
 		Staff_id string `json:"staff_id"`
 		Order_date string `json:"order_date"`
 		Final_total string `json:"final_total"`
+		Status string `json:"status"`
 	}
 
 	var  alb []sqlData;
 	for row.Next() {
 		var data sqlData;
 		err = row.Scan(&data.Order_id,&data.Customer_id,&data.Staff_id,&data.Order_date,&data.Final_total);
+		db.QueryRow("select status from payments where order_id=?",data.Order_id).Scan(&data.Status);
 		if err != nil {	
 			panic(err)
 		}
 		alb = append(alb, data);
 	}
+
 	fmt.Print(alb);
 	w.WriteHeader(http.StatusOK);
 	json.NewEncoder(w).Encode(map[string]interface{}{"data":alb});

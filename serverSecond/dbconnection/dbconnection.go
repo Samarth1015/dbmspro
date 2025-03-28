@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	_ "github.com/go-sql-driver/mysql"
-)
+)	
 
 func ConnectionToDb() *sql.DB {
 	db, err := sql.Open("mysql", "root:nandini>samarth@tcp(127.0.0.1:3306)/laundrymanagement")

@@ -21,6 +21,7 @@ export default function Customer() {
           body: JSON.stringify({ id: id }),
         });
         const result = await response.json();
+        console.log("Api response", result);
         setOrders(result.data);
       } catch (error) {
         console.error("Error fetching customer data:", error);
@@ -28,6 +29,13 @@ export default function Customer() {
     };
     getValue();
   }, [router]);
+
+  // Function to handle payment (you'll need to implement this based on your payment system)
+  const handlePayment = (orderId) => {
+    // Add your payment logic here
+    console.log(`Initiating payment for order: ${orderId}`);
+    // For example: router.push(`/payment/${orderId}`);
+  };
 
   // Loading state
   if (!orders) {
@@ -58,7 +66,6 @@ export default function Customer() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Order ID
                   </th>
-
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Staff ID
                   </th>
@@ -67,6 +74,12 @@ export default function Customer() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Final Total
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Action
                   </th>
                 </tr>
               </thead>
@@ -79,7 +92,6 @@ export default function Customer() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {order.order_id}
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {order.staff_id}
                     </td>
@@ -88,6 +100,27 @@ export default function Customer() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">
                       Rs{parseFloat(order.final_total).toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span
+                        className={
+                          order.status === "paid"
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }
+                      >
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {order.status === "pending" && (
+                        <button
+                          onClick={() => handlePayment(order.order_id)}
+                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                        >
+                          Pay Now
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -57,7 +57,6 @@ export default function Staffi() {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
 
-      // Remove the deleted order from state
       setOrders(orders.filter((order) => order.order_id !== orderId));
     } catch (err) {
       console.error("Error deleting order:", err);
@@ -96,10 +95,12 @@ export default function Staffi() {
           <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
             <thead className="bg-blue-600 text-white">
               <tr>
+                {/* No whitespace between <tr> and <th> */}
                 <th className="py-3 px-4 text-left">Order ID</th>
                 <th className="py-3 px-4 text-left">Customer ID</th>
                 <th className="py-3 px-4 text-left">Order Date</th>
                 <th className="py-3 px-4 text-left">Final Total</th>
+                <th className="py-3 px-4 text-left">Status</th>
                 <th className="py-3 px-4 text-left">Actions</th>
               </tr>
             </thead>
@@ -113,6 +114,10 @@ export default function Staffi() {
                   <td className="py-3 px-4 border-b">{order.customer_id}</td>
                   <td className="py-3 px-4 border-b">{order.order_date}</td>
                   <td className="py-3 px-4 border-b">{order.final_total}</td>
+                  <td className="py-3 px-4 border-b">
+                    {order.status.charAt(0).toUpperCase() +
+                      order.status.slice(1)}
+                  </td>
                   <td className="py-3 px-4 border-b">
                     <button
                       onClick={() => handleUpdate(order.order_id)}
