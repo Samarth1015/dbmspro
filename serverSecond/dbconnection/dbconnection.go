@@ -9,7 +9,7 @@ import (
 )	
 
 func ConnectionToDb() *sql.DB {
-	db, err := sql.Open("mysql", "root:nandini>samarth@tcp(127.0.0.1:3306)/laundrymanagement")
+	db, err := sql.Open("mysql", "root:Jenil.p12@tcp(127.0.0.1:3306)/laundrymanagement")
 	if err != nil {
 		log.Fatal("Error opening DB:", err)
 	}
