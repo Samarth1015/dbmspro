@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import QRCode from "qrcode.react";
-
+import QRCode from 'react-qr-code';
 export default function Customer() {
   const [orders, setOrders] = useState(null);
   const [payment, setPayment] = useState("");
@@ -53,17 +52,31 @@ export default function Customer() {
   // Render QR Code if payment link exists
   if (payment !== "") {
     return (
-      <div className="flex flex-col items-center gap-4 p-4 border rounded-xl shadow-lg">
-        <h2 className="text-lg font-bold">Scan to Pay</h2>
-        <QRCode value={payment} size={200} />
-        <p className="text-sm">UPI Link: {payment}</p>
-        <button
-          onClick={() => setPayment("")}
-          className="bg-blue-400 py-2 px-4 w-fit self-center rounded-xl"
-        >
-          Done Payment
-        </button>
-      </div>
+      // <div className="flex flex-col items-center gap-4 p-4 border rounded-xl shadow-lg">
+      //   <h2 className="text-lg font-bold">Scan to Pay</h2>
+      //   <QRCode value={payment} size={200} />
+      //   <p className="text-sm">UPI Link: {payment}</p>
+      //   <button
+      //     onClick={() => setPayment("")}
+      //     className="bg-blue-400 py-2 px-4 w-fit self-center rounded-xl"
+      //   >
+      //     Done Payment
+      //   </button>
+      // </div>
+
+      <div className="App">
+            <center>
+                {payment && (
+                    <QRCode
+                        title="Scan for Payment"
+                        bgColor={"#fff"}
+                        fgColor={"#000"}
+                        value={payment}
+                        size={250}
+                    />
+                )}
+            </center>
+        </div>
     );
   }
 
