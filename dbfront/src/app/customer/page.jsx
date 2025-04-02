@@ -56,7 +56,11 @@ export default function Customer() {
         });
         const result = await response.json();
         console.log("Api response", result);
-        setOrders(result.data);
+        if (result.data === null) {
+          setOrders([]);
+        } else {
+          setOrders(result.data);
+        }
       } catch (error) {
         console.error("Error fetching customer data:", error);
       }
@@ -68,7 +72,8 @@ export default function Customer() {
     console.log(`Initiating payment for order: ${orderId}`);
   };
 
-  if (!orders) {
+  console.log("Orders:", orders);
+  if (orders === null) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-blue-50 to-white">
         <div className="animate-bounce flex flex-col items-center">
@@ -77,6 +82,35 @@ export default function Customer() {
             Loading your laundry details...
           </p>
         </div>
+      </div>
+    );
+  }
+
+  // **Show "No Orders" message with an "Add Order" button**
+  if (orders.length === 0) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 text-center p-6">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-20 h-20 text-gray-400 mb-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M3 3h18v18H3z" />
+          <path d="M9 9h6v6H9z" />
+          <path d="M3 15h6v6H3z" />
+          <path d="M15 3h6v6h-6z" />
+        </svg>
+        <h2 className="text-2xl font-semibold text-gray-700">
+          No Orders Found
+        </h2>
+        <p className="text-gray-500 mt-2">
+          You haven't placed any orders yet. Start by adding a new order!
+        </p>
       </div>
     );
   }

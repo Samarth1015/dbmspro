@@ -95,7 +95,12 @@ export default function Staffi() {
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
 
         const data = await res.json();
-        setOrders(data);
+        console.log("API response:", data);
+        if (data === null) {
+          setOrders([]);
+        } else {
+          setOrders(data);
+        }
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Failed to fetch orders. Please try again.");
@@ -155,7 +160,7 @@ export default function Staffi() {
     });
   };
 
-  if (!orders) {
+  if (orders === null) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-blue-50 to-white">
         <div className="animate-bounce flex flex-col items-center">
@@ -166,6 +171,27 @@ export default function Staffi() {
           <p className="mt-2 text-sm text-gray-500">
             Please wait while we fetch your orders
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show "Add New Order" button when orders array is empty
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-12 bg-white rounded-xl shadow-lg">
+        <ClipboardList className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+        <p className="text-gray-500 text-lg">
+          No orders found. Add a new order to get started.
+        </p>
+        <div className="mt-8 text-center">
+          <button
+            onClick={redirectTo}
+            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Add New Order
+          </button>
         </div>
       </div>
     );
