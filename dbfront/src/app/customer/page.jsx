@@ -1,11 +1,44 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import QRCode from "react-qr-code";
+import { gsap } from "gsap";
+import { WashingMachine as Washing } from "lucide-react";
+
 export default function Customer() {
   const [orders, setOrders] = useState(null);
-  const [payment, setPayment] = useState("");
   const router = useRouter();
+  const headerRef = useRef(null);
+  const tableRef = useRef(null);
+  const rowRefs = useRef([]);
+
+  useEffect(() => {
+    // Initial animations
+    gsap.from(headerRef.current, {
+      y: -50,
+      opacity: 0,
+      duration: 1,
+      ease: "power3.out",
+    });
+
+    gsap.from(tableRef.current, {
+      y: 50,
+      opacity: 0,
+      duration: 1,
+      delay: 0.5,
+      ease: "power3.out",
+    });
+
+    // Stagger animation for table rows
+    if (orders) {
+      gsap.from(rowRefs.current, {
+        y: 30,
+        opacity: 0,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: "power2.out",
+      });
+    }
+  }, [orders]);
 
   useEffect(() => {
     const getValue = async () => {
@@ -22,7 +55,7 @@ export default function Customer() {
           body: JSON.stringify({ id: id }),
         });
         const result = await response.json();
-        console.log("API response", result);
+        console.log("Api response", result);
         setOrders(result.data);
       } catch (error) {
         console.error("Error fetching customer data:", error);
@@ -31,134 +64,123 @@ export default function Customer() {
     getValue();
   }, [router]);
 
-  const handlePayment = (orderId, amount) => {
-    let formattedAmount = parseFloat(amount).toFixed(2); // Ensuring correct format
-    let link = `upi://pay?pa=jenilparmar94091@okaxis&pn=Jenil&am=${formattedAmount}&cu=INR`;
-    setPayment(link);
+  const handlePayment = (orderId) => {
+    console.log(`Initiating payment for order: ${orderId}`);
   };
 
-  // Loading state
   if (!orders) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p>Loading order details...</p>
-      </div>
-    );
-  }
-
-  // Get customer ID from the first order
-  const customerId = orders.length > 0 ? orders[0].customer_id : "Unknown";
-
-  // Render QR Code if payment link exists
-
-  if (payment === "") {
-    return (
-      <div className="min-h-screen bg-gray-100 py-8">
-        <div className="max-w-5xl mx-auto px-4">
-          <h1 className="text-2xl font-bold mb-2 text-center">Order Details</h1>
-          <p className="text-center text-gray-600 mb-6">
-            This is the detail for customer with ID:{" "}
-            <span className="font-semibold">{customerId}</span>
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-blue-50 to-white">
+        <div className="animate-bounce flex flex-col items-center">
+          <Washing className="w-12 h-12 text-blue-500 animate-spin" />
+          <p className="mt-4 text-lg font-medium text-gray-600">
+            Loading your laundry details...
           </p>
-
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Order ID
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Staff ID
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Order Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Final Total
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {orders.map((order, index) => (
-                    <tr
-                      key={index}
-                      className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {order.order_id}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {order.staff_id}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {new Date(order.order_date).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">
-                        Rs {parseFloat(order.final_total).toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <span
-                          className={
-                            order.status === "paid"
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }
-                        >
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {order.status === "pending" && (
-                          <button
-                            onClick={() =>
-                              handlePayment(order.order_id, order.final_total)
-                            }
-                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                          >
-                            Pay Now
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => router.push("/signup")}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Back to Signup
-            </button>
-          </div>
         </div>
       </div>
     );
   }
+
+  const customerId = orders.length > 0 ? orders[0].customer_id : "Unknown";
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8">
+      <div className="max-w-5xl mx-auto px-4" ref={headerRef}>
+        <div className="text-center mb-8">
+          <Washing className="w-16 h-16 mx-auto text-blue-500 mb-4" />
+          <h1 className="text-3xl font-bold mb-2 text-gray-800">
+            Your Laundry Orders
+          </h1>
+          <p className="text-gray-600">
+            Customer ID:{" "}
+            <span className="font-semibold text-blue-600">{customerId}</span>
+          </p>
+        </div>
+
+        <div
+          className="bg-white shadow-xl rounded-2xl overflow-hidden"
+          ref={tableRef}
+        >
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-blue-500">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    Order ID
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    Staff ID
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    Order Date
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    Final Total
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {orders.map((order, index) => (
+                  <tr
+                    key={index}
+                    ref={(el) => (rowRefs.current[index] = el)}
+                    className="hover:bg-blue-50 transition-colors duration-200"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      #{order.order_id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {order.staff_id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(order.order_date).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">
+                      Rs{parseFloat(order.final_total).toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span
+                        className={`px-3 py-1 rounded-full ${
+                          order.status === "paid"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {order.status === "pending" && (
+                        <button
+                          onClick={() => handlePayment(order.order_id)}
+                          className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transform hover:scale-105 transition-all duration-200"
+                        >
+                          Pay Now
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => router.push("/signup")}
+            className="bg-gray-800 text-white px-6 py-3 rounded-full hover:bg-gray-900 transform hover:scale-105 transition-all duration-200"
+          >
+            Back to Signup
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
-return (
-  <div className="App">
-    <center>
-      {payment && (
-        <QRCode
-          title="Scan for Payment"
-          bgColor={"#fff"}
-          fgColor={"#000"}
-          value={payment}
-          size={250}
-        />
-      )}
-    </center>
-  </div>
-);

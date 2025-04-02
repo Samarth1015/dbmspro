@@ -1,0 +1,195 @@
+[33mcommit 2ce724cdaf9cd081d5759f78ceb61036084b4460[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Wed Apr 2 13:16:02 2025 +0530
+
+    h
+
+[33mcommit 0cab5c8330acadd3fd56684ed88021a9f49baa69[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: Priyanshukr766 <priyanshukumarnk111@gmail.com>
+Date:   Mon Mar 31 15:39:38 2025 +0530
+
+    Somewhat integrated payment
+
+[33mcommit e65e4e0f475905f4d9084b5369cda3238f89aa78[m
+Author: Priyanshukr766 <priyanshukumarnk111@gmail.com>
+Date:   Mon Mar 31 15:27:19 2025 +0530
+
+    Done making QR Code for payments
+
+[33mcommit 7af5d6bfd2b4b8c7b40ae4686fbc920a53a289f7[m
+Author: Priyanshukr766 <priyanshukumarnk111@gmail.com>
+Date:   Mon Mar 31 15:15:01 2025 +0530
+
+    Added Payment QR
+
+[33mcommit be59cc9cd34624268c2e8f4a8ab3c819ce75cfa9[m
+Author: jenilparmar <jerryhash231@gmail.com>
+Date:   Mon Mar 31 13:47:54 2025 +0530
+
+    Done making payment gateway
+
+[33mcommit 2c2c40da0bd08b2198a35c0d5d9e2228d2d2270c[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Fri Mar 28 15:08:09 2025 +0530
+
+    commit for update , payemnt fucnt
+
+[33mcommit 56eae290ceaccd8f8ec9d598057be81b3b50a6a6[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Wed Mar 26 00:43:19 2025 +0530
+
+    update delete function
+
+[33mcommit 110121cf2012de30384c61db00e89913187dd258[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Tue Mar 25 00:46:18 2025 +0530
+
+    staff update data
+
+[33mcommit 7184c034f99642dd005de913c16b89c49cecb770[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Wed Mar 12 11:15:48 2025 +0530
+
+    changes in sql
+
+[33mcommit f0765a2e0f5f805b33440abb603df2d1b111865d[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Wed Mar 12 11:15:32 2025 +0530
+
+    functional changes made
+
+[33mcommit 6f758dad1e2e6c96b919fc0fdd5ff6864c88be5b[m
+Author: jenilparmar <jerryhash231@gmail.com>
+Date:   Thu Mar 6 00:09:30 2025 +0530
+
+    Placing of order done also integrate postgres
+
+[33mcommit db8b0c26fc25953af6a6bb7b2df1a8e98886e01d[m
+Author: Priyanshukr766 <priyanshukumarnk111@gmail.com>
+Date:   Sat Mar 1 15:18:33 2025 +0530
+
+    finalllllllll code update
+
+[33mcommit 1293533b1e3b86bc5b931a150aedf3c07360161b[m
+Merge: 8afc862 52d1870
+Author: Priyanshukr766 <priyanshukumarnk111@gmail.com>
+Date:   Sat Mar 1 14:49:43 2025 +0530
+
+    Merge branch 'main' of https://github.com/Samarth1015/dbmspro
+
+[33mcommit 8afc862f93306806adc1253f5228291d01c89e9a[m
+Author: Priyanshukr766 <priyanshukumarnk111@gmail.com>
+Date:   Sat Mar 1 14:48:13 2025 +0530
+
+    table update
+
+[33mcommit 52d1870bd078162650aa36fa13be304c1b8c8e16[m
+Merge: 47db538 997b881
+Author: jenilparmar <jerryhash231@gmail.com>
+Date:   Sat Mar 1 10:44:59 2025 +0530
+
+    Merge branch 'main' of https://github.com/Samarth1015/dbmspro
+
+[33mcommit 47db538efbe42b44634f158e4d3b826e8ee98cfe[m
+Author: jenilparmar <jerryhash231@gmail.com>
+Date:   Sat Mar 1 10:39:59 2025 +0530
+
+    chaging server to python becuase in go are we unable to connent frontend with backend many configuration issues
+
+[33mcommit 997b8819b1c287eeef4e4103fc55a553d41231f5[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Wed Feb 19 19:10:28 2025 +0530
+
+    h
+
+[33mcommit bd2058ac1c734c6f476637ad86e2f7f0438c30c1[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Wed Feb 19 19:09:06 2025 +0530
+
+    c
+
+[33mcommit 08059841cc9285b0d55c7dcabbe9beb387ab611a[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Wed Feb 19 19:08:06 2025 +0530
+
+    h
+
+[33mcommit 11cbb7b13f6ba3ce4e019f2535f6b457b060d634[m
+Merge: 76e0719 c3c3155
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Wed Feb 19 18:47:36 2025 +0530
+
+    Merge branch 'main' of https://github.com/Samarth1015/dbmspro
+
+[33mcommit 76e0719e864e93e2de94bc770bf1064c8571831b[m
+Merge: 036a3cc 25e4846
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Wed Feb 19 18:47:04 2025 +0530
+
+    Merge branch 'main' of https://github.com/Samarth1015/dbmspro
+
+[33mcommit 036a3ccdb042c35242de0eb7ed3cc4c051871516[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Wed Feb 19 18:46:51 2025 +0530
+
+    doin
+
+[33mcommit c3c31559ab858d25bdc37b3e2d90f576604445e0[m
+Author: jenilparmar <jerryhash231@gmail.com>
+Date:   Wed Feb 19 18:46:41 2025 +0530
+
+    staff table corrected removed staff hire date
+
+[33mcommit 25e48467b17bf3f50a5bece6c2ce4c71ff67d90b[m
+Author: jenilparmar <jerryhash231@gmail.com>
+Date:   Wed Feb 19 18:19:15 2025 +0530
+
+    trigger funcations added and started wokring on laundry giving funcationality
+
+[33mcommit da23dab9d42afcd9e5307ea0457c8813151d4b6b[m
+Author: Priyanshukr766 <priyanshukumarnk111@gmail.com>
+Date:   Wed Feb 12 18:08:09 2025 +0530
+
+    SQL Table Added
+
+[33mcommit cb5ed2937a7b5a792d0cc628688ef6986a262c22[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Wed Feb 12 05:59:29 2025 +0530
+
+    add part done check remain
+
+[33mcommit 707253e852eaaa8fe82c1faa6e64a94abeebfbe0[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Sun Feb 9 22:58:16 2025 +0530
+
+    strict mode
+
+[33mcommit 976f129ff7dd9b12de52245e4ab3ff4f78ca9e5f[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Sun Feb 9 22:15:31 2025 +0530
+
+    full Authentication done
+
+[33mcommit 9f3b280dc0ff9d2c398e3ce3a810da978e92b274[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Sun Feb 9 03:31:27 2025 +0530
+
+    auth
+
+[33mcommit ba2f1aaa235aa9de1d738b11c51ca65dc5b8b14b[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Sat Feb 8 15:42:47 2025 +0530
+
+    signup login complete with token
+
+[33mcommit 61b1e4541179547fc34cb41fb456e4313616c351[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Fri Feb 7 11:57:11 2025 +0530
+
+    init
+
+[33mcommit 371d5c7b0d24875591b2fa44ee63e9b3ec899fa7[m
+Author: samarth <202351125@iiitvadodara.ac.in>
+Date:   Fri Feb 7 11:57:07 2025 +0530
+
+    first commit
