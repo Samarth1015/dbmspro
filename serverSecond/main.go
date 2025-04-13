@@ -26,6 +26,8 @@ func main() {
 	r.HandleFunc("/api/staff/{id}", controller.Updatedata).Methods("GET")
 	r.HandleFunc("/api/staff/{id}", controller.OfficialUpdate).Methods("PUT")
 	r.HandleFunc("/api/staff/{id}", controller.Delete).Methods("DELETE")	
+	r.HandleFunc("/api/updateamt/{id}",controller.UpdateAmt).Methods("PUT")
+	
 
 
 

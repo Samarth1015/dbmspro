@@ -68,7 +68,7 @@ export default function Customer() {
     getValue();
   }, [router]);
 
-  const handlePayment = (orderId) => {
+  const handlePayment = (orderId, amount) => {
     console.log(`Initiating payment for order: ${orderId}`);
   };
 
@@ -192,7 +192,11 @@ export default function Customer() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       {order.status === "pending" && (
                         <button
-                          onClick={() => handlePayment(order.order_id)}
+                          onClick={() =>
+                            router.push(
+                              `/temp/${order.final_total}?orderId=${order.order_id}`
+                            )
+                          }
                           className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transform hover:scale-105 transition-all duration-200"
                         >
                           Pay Now
