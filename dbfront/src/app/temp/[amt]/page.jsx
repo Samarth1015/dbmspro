@@ -25,6 +25,7 @@ const PaymentPage = ({ params }) => {
     const data = await res.json();
     if (res.status === 200) {
       console.log("Payment updated successfully:", data);
+      router.back();
     } else {
       console.error("Error updating payment:", data);
     }
