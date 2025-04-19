@@ -176,7 +176,7 @@ export default function Customer() {
                       {new Date(order.order_date).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">
-                      Rs{parseFloat(order.final_total).toFixed(2)}
+                      Rs{parseFloat(order.final_total || "0").toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span
@@ -190,7 +190,8 @@ export default function Customer() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {order.status === "pending" && (
+                      {order.status === "pending" &&
+                      parseFloat(order.final_total || "0") > 0 ? (
                         <button
                           onClick={() =>
                             router.push(
@@ -201,7 +202,9 @@ export default function Customer() {
                         >
                           Pay Now
                         </button>
-                      )}
+                      ) : order.status === "pending" ? (
+                        <span className="text-gray-500">Amount not set</span>
+                      ) : null}
                     </td>
                   </tr>
                 ))}

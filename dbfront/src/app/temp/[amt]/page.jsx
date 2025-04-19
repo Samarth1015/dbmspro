@@ -1,16 +1,18 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, use } from "react";
 import QRCode from "react-qr-code";
 
 const PaymentPage = ({ params }) => {
   const router = useRouter();
-  const searchParams = useSearchParams(); // ✅ moved outside useEffect
-  const orderId = searchParams.get("orderId"); // ✅ safe to use here
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get("orderId");
 
-  const amt = parseInt(params.amt); // dynamic segment
+  const resolvedParams = use(params);
+  const amt = parseInt(resolvedParams.amt);
   const [payment, setPayment] = useState("");
-  const [amount, setAmount] = useState(amt || 0); // form input
+  const [amount, setAmount] = useState(amt || 0);
+  const [userId, setUserId] = useState("");
 
   const handlePayment = (value) => {
     const upiLink = `upi://pay?pa=jenilparmar94091@okaxis&pn=Jenil&am=${value}&cu=INR`;
@@ -21,18 +23,31 @@ const PaymentPage = ({ params }) => {
     console.log("Payment completed for order:", orderId);
     let res = await fetch(`http://localhost:8000/api/updateamt/${orderId}`, {
       method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: userId,
+        amount: amount.toString(),
+      }),
     });
-    const data = await res.json();
-    if (res.status === 200) {
-      console.log("Payment updated successfully:", data);
-      router.back();
-    } else {
-      console.error("Error updating payment:", data);
+    try {
+      const data = await res.json();
+      if (res.status === 200) {
+        console.log("Payment updated successfully:", data);
+        router.back();
+      } else {
+        console.error("Error updating payment:", data);
+      }
+    } catch (error) {
+      console.error("Error processing response:", error);
     }
-    // ✅ optional: redirect or API call
-    // router.push("/thank-you");
   };
 
+  useEffect(() => {
+    let id = localStorage.getItem("id");
+    setUserId(id);
+  }, []);
   useEffect(() => {
     if (amt) {
       handlePayment(amt);

@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { WashingMachine, Plus, CreditCard, Wallet, Send } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Add() {
   const [loading, setLoading] = useState(true);
@@ -24,7 +25,7 @@ export default function Add() {
     { id: 3, name: "press", price: 5, icon: WashingMachine },
     { id: 4, name: "wash and press", price: 12, icon: WashingMachine },
   ];
-
+  const router = useRouter();
   const paymentStatuses = ["pending", "paid"];
   const paymentModes = ["cash", "card", "online"];
 
@@ -123,6 +124,7 @@ export default function Add() {
     }
 
     try {
+      console.log(orderData);
       const response = await fetch("http://localhost:8000/api/addorder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -144,6 +146,7 @@ export default function Add() {
           setSelectedServices([]);
           setPaymentStatus("pending");
           setPaymentMode("cash");
+          router.push("/staff");
           // Animate form back in
           gsap.to(formRef.current, {
             y: 0,

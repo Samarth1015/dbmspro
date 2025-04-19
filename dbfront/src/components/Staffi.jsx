@@ -335,7 +335,7 @@ export default function Staffi() {
                         {new Date(order.order_date).toLocaleString()}
                       </td>
                       <td className="py-4 px-6 border-b font-medium">
-                        Rs {parseFloat(order.final_total).toFixed(2)}
+                        Rs {parseFloat(order.final_total || "0").toFixed(2)}
                       </td>
                       <td className="py-4 px-6 border-b">
                         <span
