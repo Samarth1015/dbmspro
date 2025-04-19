@@ -8,6 +8,8 @@ import {
   CreditCard,
   Wallet,
   Package2,
+  Iron,
+  Shirt,
 } from "lucide-react";
 
 export default function Update({ params }) {
@@ -16,6 +18,15 @@ export default function Update({ params }) {
   const [loading, setLoading] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState("pending");
   const [paymentMode, setPaymentMode] = useState("cash");
+  const [allServices, setAllServices] = useState([]);
+
+  // Services data
+  const services = [
+    { id: 1, name: "Wash", price: 10, icon: WashingMachine },
+    { id: 2, name: "Dryclean", price: 20, icon: Shirt },
+    { id: 3, name: "Press", price: 5, icon: Iron },
+    { id: 4, name: "Wash and Press", price: 12, icon: WashingMachine },
+  ];
 
   // Refs for GSAP animations
   const containerRef = useRef(null);
@@ -49,6 +60,9 @@ export default function Update({ params }) {
         setData(result[0]);
         setPaymentStatus(result[0].payment_status);
         setPaymentMode(result[0].payment_mode || "cash");
+
+        // Initialize all services with existing order data
+        initializeAllServices(result[0].inner);
       } catch (error) {
         console.error("Error fetching data: ", error);
       } finally {
@@ -117,18 +131,64 @@ export default function Update({ params }) {
     }
   }, [loading]);
 
-  const handleQuantityChange = (index, newQuantity) => {
-    // Animate quantity change
-    gsap.to(serviceRowRefs.current[index], {
-      scale: 1.05,
-      duration: 0.2,
-      yoyo: true,
-      repeat: 1,
+  // Initialize all services array with quantities from order
+  const initializeAllServices = (orderItems) => {
+    const servicesWithQuantity = services.map((service) => {
+      const orderItem = orderItems.find(
+        (item) => parseInt(item.service_id) === service.id
+      );
+      return {
+        ...service,
+        quantity: orderItem ? orderItem.quantity.toString() : "0",
+        inOrder: !!orderItem,
+      };
     });
+    setAllServices(servicesWithQuantity);
+  };
 
-    let updatedInner = [...data.inner];
-    updatedInner[index].quantity = newQuantity;
-    setData({ ...data, inner: updatedInner });
+  // Get service details by ID
+  const getServiceById = (serviceId) => {
+    return (
+      services.find((service) => service.id === parseInt(serviceId)) || {
+        name: "Unknown Service",
+        price: 0,
+        icon: WashingMachine,
+      }
+    );
+  };
+
+  // Handle quantity change for any service
+  const handleServiceQuantityChange = (serviceId, newQuantity) => {
+    // Update the allServices state
+    setAllServices((prev) =>
+      prev.map((service) =>
+        service.id === serviceId
+          ? {
+              ...service,
+              quantity: newQuantity,
+              inOrder: parseInt(newQuantity) > 0,
+            }
+          : service
+      )
+    );
+  };
+
+  // Prepare data for saving to backend
+  const prepareDataForSave = () => {
+    // Filter services with quantity > 0 and format for backend
+    const updatedInner = allServices
+      .filter((service) => parseInt(service.quantity) > 0)
+      .map((service) => ({
+        service_id: service.id.toString(),
+        quantity: service.quantity,
+      }));
+
+    return {
+      ...data,
+      inner: updatedInner,
+      payment_status: paymentStatus,
+      ...(paymentStatus === "paid" && { payment_mode: paymentMode }),
+    };
   };
 
   const handleSave = async () => {
@@ -140,12 +200,9 @@ export default function Update({ params }) {
       repeat: 1,
     });
 
-    const updatedData = {
-      ...data,
-      payment_status: paymentStatus,
-      ...(paymentStatus === "paid" && { payment_mode: paymentMode }),
-    };
+    const updatedData = prepareDataForSave();
 
+    console.log(updatedData);
     try {
       let response = await fetch(`http://localhost:8000/api/staff/${id}`, {
         method: "PUT",
@@ -238,8 +295,11 @@ export default function Update({ params }) {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-blue-50 text-left">
-                      <th className="py-3 px-6 text-sm font-medium text-gray-700 rounded-tl-lg">
-                        Service ID
+                      <th className="py-3 px-6 text-sm font-medium text-gray-700">
+                        Service
+                      </th>
+                      <th className="py-3 px-6 text-sm font-medium text-gray-700">
+                        Price
                       </th>
                       <th className="py-3 px-6 text-sm font-medium text-gray-700 rounded-tr-lg">
                         Quantity
@@ -247,29 +307,73 @@ export default function Update({ params }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.inner.map((item, index) => (
-                      <tr
-                        key={index}
-                        ref={(el) => (serviceRowRefs.current[index] = el)}
-                        className="border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200"
-                      >
-                        <td className="py-4 px-6 text-gray-700">
-                          {item.service_id}
-                        </td>
-                        <td className="py-4 px-6">
-                          <input
-                            type="number"
-                            min="1"
-                            value={item.quantity}
-                            onChange={(e) =>
-                              handleQuantityChange(index, e.target.value)
-                            }
-                            className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                          />
-                        </td>
-                      </tr>
-                    ))}
+                    {allServices.map((service, index) => {
+                      const ServiceIcon = service.icon || WashingMachine;
+                      return (
+                        <tr
+                          key={index}
+                          ref={(el) => (serviceRowRefs.current[index] = el)}
+                          className={`border-b border-gray-100 hover:bg-blue-50 transition-colors duration-200 ${
+                            parseInt(service.quantity) > 0
+                              ? "bg-blue-50/30"
+                              : ""
+                          }`}
+                        >
+                          <td className="py-4 px-6 text-gray-700">
+                            <div className="flex items-center space-x-2">
+                              <ServiceIcon className="w-5 h-5 text-blue-500" />
+                              <span>{service.name}</span>
+                              <span className="text-xs text-gray-500">
+                                ({service.id})
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 text-gray-700">
+                            ${service.price.toFixed(2)}
+                          </td>
+                          <td className="py-4 px-6">
+                            <input
+                              type="number"
+                              min="0"
+                              value={service.quantity}
+                              onChange={(e) =>
+                                handleServiceQuantityChange(
+                                  service.id,
+                                  e.target.value
+                                )
+                              }
+                              className={`w-24 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+                                parseInt(service.quantity) > 0
+                                  ? "border-blue-500"
+                                  : "border-gray-300"
+                              }`}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
+                  <tfoot>
+                    <tr className="bg-blue-50">
+                      <td
+                        className="py-3 px-6 font-medium text-gray-700"
+                        colSpan="2"
+                      >
+                        Total
+                      </td>
+                      <td className="py-3 px-6 font-medium text-gray-700">
+                        $
+                        {allServices
+                          .reduce((total, service) => {
+                            return (
+                              total +
+                              service.price * parseInt(service.quantity || "0")
+                            );
+                          }, 0)
+                          .toFixed(2)}
+                      </td>
+                    </tr>
+                  </tfoot>
                 </table>
               </div>
             </div>

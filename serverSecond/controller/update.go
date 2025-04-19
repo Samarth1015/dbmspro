@@ -131,21 +131,59 @@ func OfficialUpdate(w http.ResponseWriter, r *http.Request) {
     fmt.Printf("Customer ID: %s\n", dataReq.CustomerID)
     
     fmt.Println("Services:")
-    db:=dbconnection.ConnectionToDb();
-    defer db.Close();
-    for _, item := range dataReq.Inner {
-        db.Exec("UPDATE order_details SET quantity = ? WHERE order_id = ? AND service_id = ?", item.Quantity, dataReq.OrderID, item.ServiceID);
-        
-    }
-     date:=time.Now();
+    db := dbconnection.ConnectionToDb()
+    defer db.Close()
     
-    db.Exec("UPDATE payments SET status = ?, payment_mode = ? , payment_date=? WHERE order_id = ?",dataReq.PaymentStatus,dataReq.PaymentMethod,date,dataReq.OrderID);
+    for _, item := range dataReq.Inner {
+        // Check if the service_id exists for this order_id
+        var count int
+        err := db.QueryRow("SELECT COUNT(*) FROM order_details WHERE order_id = ? AND service_id = ?", 
+            dataReq.OrderID, item.ServiceID).Scan(&count)
+        
+        if err != nil {
+            fmt.Printf("Error checking service existence: %v\n", err)
+            continue
+        }
+        
+        if count > 0 {
+            // Service exists, update it
+            _, err = db.Exec("UPDATE order_details SET quantity = ? WHERE order_id = ? AND service_id = ?", 
+                item.Quantity, dataReq.OrderID, item.ServiceID)
+            if err != nil {
+                fmt.Printf("Error updating service %s: %v\n", item.ServiceID, err)
+            } else {
+                fmt.Printf("Updated service %s with quantity %s\n", item.ServiceID, item.Quantity)
+            }
+        } else {
+            // Service doesn't exist, insert it
+            _, err = db.Exec("INSERT INTO order_details (order_id, service_id, quantity) VALUES (?, ?, ?)", 
+                dataReq.OrderID, item.ServiceID, item.Quantity)
+            if err != nil {
+                fmt.Printf("Error inserting service %s: %v\n", item.ServiceID, err)
+            } else {
+                fmt.Printf("Inserted new service %s with quantity %s\n", item.ServiceID, item.Quantity)
+            }
+        }
+    }
+    
+    date := time.Now()
+ type amount struct{
+    Amount string `json:"Final_total"`
 
-  
-    w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(http.StatusOK)
-    json.NewEncoder(w).Encode(map[string]string{
-        "message": "Data updated successfully",
-        "id":      id,
-    })
+ }
+    var amt amount;
+    db.QueryRow("select Final_Total from orders where order_id=?",dataReq.OrderID).Scan(&amt.Amount);
+    
+  _, err = db.Exec("UPDATE payments SET status = ?, payment_mode = ?, payment_date = ?, amount = ? WHERE order_id = ?", 
+    dataReq.PaymentStatus, dataReq.PaymentMethod, date, amt.Amount, dataReq.OrderID)
+  if err != nil {
+      panic(err)
+  }
+
+  w.Header().Set("Content-Type", "application/json")
+  w.WriteHeader(http.StatusOK)
+  json.NewEncoder(w).Encode(map[string]string{
+      "message": "Data updated successfully", 
+      "id":      id,
+  })
 }
